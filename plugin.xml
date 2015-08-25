@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    id="com.dawsonloudon.videoplayer"
+    id="com.simplec.plugins.videoplayer"
     version="1.0.0">
 
     <engines>
@@ -9,8 +9,8 @@
     </engines>
 
 	<name>VideoPlayer</name>
-	<description>Play video with native support for android</description>
-    <author>Dawson Loudon</author>
+	<description>Play video with native file support for android</description>
+    <author>SimpleC</author>
     <keywords>video,android</keywords>
 	<license>MIT</license>
     
@@ -21,14 +21,15 @@
     <platform name="android">
 		<config-file target="res/xml/config.xml" parent="/*">
             <feature name="VideoPlayer" >
-                <param name="android-package" value="com.dawsonloudon.videoplayer.VideoPlayer"/>
+                <param name="android-package" value="com.simplec.phonegap.plugins.videoplayer.VideoPlayer"/>
             </feature>
         </config-file>
 		
 		<config-file target="AndroidManifest.xml" parent="/*">
             <uses-permission android:name="android.permission.INTERNET" />
         </config-file>
-        <source-file src="src/android/VideoPlayer.java" target-dir="src/com/dawsonloudon/videoplayer" />
+        
+	    <source-file src="src/android/com/simplec/phonegap/plugins/videoplayer/VideoPlayer.java" target-dir="src/com/simplec/phonegap/plugins/videoplayer"/>
 	</platform>
     
 </plugin>
