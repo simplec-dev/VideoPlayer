@@ -53,7 +53,9 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
      * @return              A PluginResult object with a status and message.
      */
     public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
+        Log.v(LOG_TAG, "got command: "+action);
         if (action.equals("play")) {
+            Log.v(LOG_TAG, "playing");
             CordovaResourceApi resourceApi = webView.getResourceApi();
             String target = args.getString(0);
             final JSONObject options = args.getJSONObject(1);
@@ -70,6 +72,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 
             final String path = stripFileProtocol(fileUriStr);
 
+            Log.v(LOG_TAG, "playing path: "+path);
             // Create dialog in new thread
             cordova.getActivity().runOnUiThread(new Runnable() {
                 public void run() {
@@ -82,6 +85,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
             return true;
         }
         if (action.equals("stop")) {
+            Log.v(LOG_TAG, "stopping");
         	stop(callbackContext);
         	callbackContext.success();
         	return true;
@@ -139,12 +143,14 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
                 player.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
             } catch (Exception e) {
                 callbackContext.error(e.getLocalizedMessage());
+                Log.v(LOG_TAG, "error: "+e.getLocalizedMessage());
             }
         } else {
             try {
                 player.setDataSource(path);
             } catch (Exception e) {
                 callbackContext.error(e.getLocalizedMessage());
+                Log.v(LOG_TAG, "error: "+e.getLocalizedMessage());
             }
         }
 
@@ -153,6 +159,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
             player.setVolume(volume, volume);
         } catch (Exception e) {
             callbackContext.error(e.getLocalizedMessage());
+            Log.v(LOG_TAG, "error: "+e.getLocalizedMessage());
         }
 
         if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
