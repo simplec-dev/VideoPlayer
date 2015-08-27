@@ -58,7 +58,13 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
             Log.v(LOG_TAG, "playing");
             CordovaResourceApi resourceApi = webView.getResourceApi();
             String target = args.getString(0);
-            final JSONObject options = args.getJSONObject(1);
+            final JSONObject options = new JSONObject();
+            
+            try {
+            	args.getJSONObject(1);
+            } catch (Exception e) {
+            	// gobble.  no options sent
+            }
 
             String fileUriStr;
             try {
