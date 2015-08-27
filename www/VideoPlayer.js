@@ -21,6 +21,22 @@ var VideoPlayer = {
 
 	    stop: function(success, failure) {
 	        exec(success, failure, "VideoPlayer", "stop", []);
+	    },
+	    
+	    pause: function(success, failure) {
+	        exec(null, null, "VideoPlayer", "pause", []);
+	    },
+	    
+	    getDuration: function(success, failure) {
+	        exec(success, failure, "VideoPlayer", "duration", []);
+	    },
+	    
+	    seek: function(seekTo, success, failure) {
+	        exec(success, failure, "VideoPlayer", "seek", [seekTo]);
+	    },
+	    
+	    isPlaying: function(success, failure) {
+	        exec(success, failure, "VideoPlayer", "playing", []);
 	    }
 };
 

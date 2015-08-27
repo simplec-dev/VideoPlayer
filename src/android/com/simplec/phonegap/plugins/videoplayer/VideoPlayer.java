@@ -36,295 +36,393 @@ import android.widget.VideoView;
 
 public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, OnPreparedListener, OnErrorListener {
 
-    protected static final String LOG_TAG = "VideoPlayer";
+	protected static final String LOG_TAG = "VideoPlayer";
 
-    protected static final String ASSETS = "/android_asset/";
-    protected static final String FILE = "file://";
+	protected static final String ASSETS = "/android_asset/";
+	protected static final String FILE = "file://";
 
-    private Dialog dialog;
-    private VideoView videoView;
-    private MediaPlayer player;
-    private CallbackContext callbackContext;
+	private boolean startPlaying = true;
+	private Dialog dialog;
+	private VideoView videoView;
+	private MediaPlayer player;
+	private CallbackContext callbackContext;
 
-    /**
-     * Executes the request and returns PluginResult.
-     *
-     * @param action        The action to execute.
-     * @param args          JSONArray of arguments for the plugin.
-     * @param callbackId    The callback id used when calling back into JavaScript.
-     * @return              A PluginResult object with a status and message.
-     */
-    public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
-        Log.v(LOG_TAG, "got command: "+action);
-        if (action.equals("play")) {
-            Log.v(LOG_TAG, "playing");
-            CordovaResourceApi resourceApi = webView.getResourceApi();
-            String target = args.getString(0);
-            final JSONObject options = new JSONObject();
-            
-            try {
-            	args.getJSONObject(1);
-            } catch (Exception e) {
-            	// gobble.  no options sent
-            }
 
-            String fileUriStr;
-            try {
-                Uri targetUri = resourceApi.remapUri(Uri.parse(target));
-                fileUriStr = targetUri.toString();
-            } catch (IllegalArgumentException e) {
-                fileUriStr = target;
-            }
+	public final static String PAUSE = "pause";
+	public final static String PLAY = "play";
+	public final static String STOP = "stop";
+	public final static String DURATION = "duration";
+	public final static String SEEK = "seek";
+	public final static String PLAYING = "playing";
+	
+	public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext)
+			throws JSONException {
+		Log.v(LOG_TAG, "got command: " + action);
+		if (action.equals("pause")) {
+			pause();
+			return true;
+		}
+		if (action.equals(PLAY)) {
+			if (this.player != null) {
+				resume();
+				return true;
+			}
+			
+			play(args, callbackContext);
 
-            Log.v(LOG_TAG, fileUriStr);
-            
-            File f = new File(fileUriStr);
-            if (!f.exists()) {
-            	callbackContext.error("video does not exist");
-            	return true;
-            }
+			return true;
+		}
+		if (action.equals(STOP)) {
+			Log.v(LOG_TAG, "stopping");
+			stop();
+			return true;
+		}
+		if (action.equals(PLAYING)) {
+			if (player!=null) {
+				callbackContext.success(player.isPlaying()?1:0);
+			} else {
+				callbackContext.error("no player");
+			}
+			return true;
+		}
+		if (action.equals(DURATION)) {
+			if (player!=null) {
+				callbackContext.success(player.getDuration() / 1000);
+			} else {
+				callbackContext.error("no player");
+			}
+			return true;
+		}
+		if (action.equals(SEEK)) {			
+			if (player!=null) {
+				int sec = args.getInt(0);
+				int msec = sec*1000;
+				if (msec<0) {
+					msec = player.getDuration()-1;
+				}
+				
+				player.seekTo(msec);
+				callbackContext.success();
+			} else {
+				callbackContext.error("no player");
+			}
+			return true;
+		}
+		return false;
+	}
 
-            final String path = stripFileProtocol(fileUriStr);
+	/**
+	 * Removes the "file://" prefix from the given URI string, if applicable. If
+	 * the given URI string doesn't have a "file://" prefix, it is returned
+	 * unchanged.
+	 *
+	 * @param uriString
+	 *            the URI string to operate on
+	 * @return a path without the "file://" prefix
+	 */
+	public static String stripFileProtocol(String uriString) {
+		if (uriString.startsWith("file://")) {
+			return Uri.parse(uriString).getPath();
+		}
+		return uriString;
+	}
 
-            Log.v(LOG_TAG, "playing path: "+path);
-            // Create dialog in new thread
-            cordova.getActivity().runOnUiThread(new Runnable() {
-                public void run() {
-                    openVideoDialog(path, options, callbackContext);
-                }
-            });
-
-            return true;
-        }
-        if (action.equals("stop")) {
-            Log.v(LOG_TAG, "stopping");
-        	stop(callbackContext);
-        	return true;
-        }
-        return false;
-    }
-
-    /**
-     * Removes the "file://" prefix from the given URI string, if applicable.
-     * If the given URI string doesn't have a "file://" prefix, it is returned unchanged.
-     *
-     * @param uriString the URI string to operate on
-     * @return a path without the "file://" prefix
-     */
-    public static String stripFileProtocol(String uriString) {
-        if (uriString.startsWith("file://")) {
-            return Uri.parse(uriString).getPath();
-        }
-        return uriString;
-    }
-
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    protected void openVideoDialog(String path, JSONObject options, final CallbackContext callbackContext) {
-		this.callbackContext = callbackContext;
+	public boolean play(CordovaArgs args, final CallbackContext callbackContext)  {
+		stop();
 		
-        // Let's create the main dialog
-        dialog = new Dialog(cordova.getActivity(), android.R.style.Theme_NoTitleBar);
-        dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setCancelable(true);
+		try {
+			CordovaResourceApi resourceApi = webView.getResourceApi();
+			String target = args.getString(0);
+			JSONObject optionsTmp = new JSONObject();
 
-        // Main container layout
-        LinearLayout main = new LinearLayout(cordova.getActivity());
-        main.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-        main.setOrientation(LinearLayout.VERTICAL);
-        main.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
-        main.setVerticalGravity(Gravity.CENTER_VERTICAL);
+			try {
+				optionsTmp = args.getJSONObject(1);
+			} catch (Exception e) {
+				// gobble. no options sent
+			}
+			final JSONObject options = optionsTmp;
 
-        videoView = new VideoView(cordova.getActivity());
-        videoView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-        // videoView.setVideoURI(uri);
-        // videoView.setVideoPath(path);
-        main.addView(videoView);
+			String fileUriStr;
+			try {
+				Uri targetUri = resourceApi.remapUri(Uri.parse(target));
+				fileUriStr = targetUri.toString();
+			} catch (IllegalArgumentException e) {
+				fileUriStr = target;
+			}
 
-        player = new MediaPlayer();
-        player.setOnPreparedListener(this);
-        player.setOnCompletionListener(this);
-        player.setOnErrorListener(this);
+			Log.v(LOG_TAG, fileUriStr);
 
-        if (path.startsWith(ASSETS)) {
-            String f = path.substring(ASSETS.length());
-            AssetFileDescriptor fd = null;
-            try {
-                fd = cordova.getActivity().getAssets().openFd(f);
-                player.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
-            } catch (Exception e) {
-                callbackContext.error(e.getLocalizedMessage());
-                Log.v(LOG_TAG, "error: "+e.getLocalizedMessage());
-            }
-        } else {
-            try {
-                player.setDataSource(path);
-            } catch (Exception e) {
-                callbackContext.error(e.getLocalizedMessage());
-                Log.v(LOG_TAG, "error: "+e.getLocalizedMessage());
-            }
-        }
+			File f = new File(fileUriStr);
+			if (!f.exists()) {
+				callbackContext.error("video does not exist");
+				return true;
+			}
 
-        try {
-            float volume = Float.valueOf(options.getString("volume"));
-            player.setVolume(volume, volume);
-        } catch (Exception e) {
-            callbackContext.error(e.getLocalizedMessage());
-            Log.v(LOG_TAG, "error: "+e.getLocalizedMessage());
-        }
+			final String path = stripFileProtocol(fileUriStr);
 
-        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            try {
-                int scalingMode = options.getInt("scalingMode");
-                switch (scalingMode) {
-                    case MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING:
-                        player.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
-                        break;
-                    default:
-                        player.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
-                }
-            } catch (Exception e) {
-                callbackContext.error(e.getLocalizedMessage());
-            }
-        }
+			Log.v(LOG_TAG, "playing path: " + path);
+			// Create dialog in new thread
+			cordova.getActivity().runOnUiThread(new Runnable() {
+				public void run() {
+					openVideoDialog(path, options, callbackContext);
+				}
+			});
 
-        final SurfaceHolder mHolder = videoView.getHolder();
-        mHolder.setKeepScreenOn(true);
-        mHolder.addCallback(new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(SurfaceHolder holder) {
-            	if (player!=null) {
-	                player.setDisplay(holder);
-	                try {
-	                    player.prepare();
-	                } catch (Exception e) {
-	                    callbackContext.error(e.getLocalizedMessage());
-	                }
-            	}
-            }
-            @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {
-            	if (player!=null) {
-                    player.release();
-                    player = null;
-            	}
-            }
-            @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
-        });
+			return true;
+		} catch (JSONException je) {
+			callbackContext.error(je.getLocalizedMessage());
+			return false;
+		}
+	}
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+	protected void openVideoDialog(String path, JSONObject options, final CallbackContext callbackContext) {
+		this.callbackContext = callbackContext;
 
-        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-        lp.copyFrom(dialog.getWindow().getAttributes());
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+		// Let's create the main dialog
+		dialog = new Dialog(cordova.getActivity(), android.R.style.Theme_NoTitleBar);
+		dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
+		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		dialog.setCancelable(true);
 
-        dialog.setContentView(main);
-        dialog.show();
-        dialog.getWindow().setAttributes(lp);
-    }
+		// Main container layout
+		LinearLayout main = new LinearLayout(cordova.getActivity());
+		main.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		main.setOrientation(LinearLayout.VERTICAL);
+		main.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
+		main.setVerticalGravity(Gravity.CENTER_VERTICAL);
 
-	    @Override
-	    public boolean onError(MediaPlayer mp, int what, int extra) {
-	        Log.e(LOG_TAG, "AudioPlayer.onError(" + what + ", " + extra + ")");
+		videoView = new VideoView(cordova.getActivity());
+		videoView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		// videoView.setVideoURI(uri);
+		// videoView.setVideoPath(path);
+		main.addView(videoView);
 
-	        JSONObject event = new JSONObject();
-	        try {
-				event.put("type", "error");
-		        event.put("what", what);
-		        event.put("extra", extra);
+		player = new MediaPlayer();
+		player.setOnPreparedListener(this);
+		player.setOnCompletionListener(this);
+		player.setOnErrorListener(this);
+
+		if (path.startsWith(ASSETS)) {
+			String f = path.substring(ASSETS.length());
+			AssetFileDescriptor fd = null;
+			try {
+				fd = cordova.getActivity().getAssets().openFd(f);
+				player.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
+			} catch (Exception e) {
+				callbackContext.error(e.getLocalizedMessage());
+				Log.v(LOG_TAG, "error: " + e.getLocalizedMessage());
+			}
+		} else {
+			try {
+				player.setDataSource(path);
+			} catch (Exception e) {
+				callbackContext.error(e.getLocalizedMessage());
+				Log.v(LOG_TAG, "error: " + e.getLocalizedMessage());
+			}
+		}
+
+		try {
+			float volume = Float.valueOf(options.getString("volume"));
+			player.setVolume(volume, volume);
+		} catch (Exception e) {
+			callbackContext.error(e.getLocalizedMessage());
+			Log.v(LOG_TAG, "error: " + e.getLocalizedMessage());
+		}
+
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+			try {
+				int scalingMode = options.getInt("scalingMode");
+				switch (scalingMode) {
+				case MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING:
+					player.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
+					break;
+				default:
+					player.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
+				}
+			} catch (Exception e) {
+				callbackContext.error(e.getLocalizedMessage());
+			}
+		}
+
+		final SurfaceHolder mHolder = videoView.getHolder();
+		mHolder.setKeepScreenOn(true);
+		mHolder.addCallback(new SurfaceHolder.Callback() {
+			@Override
+			public void surfaceCreated(SurfaceHolder holder) {
+				if (player != null) {
+					player.setDisplay(holder);
+					try {
+						player.prepare();
+					} catch (Exception e) {
+						callbackContext.error(e.getLocalizedMessage());
+					}
+				}
+			}
+
+			@Override
+			public void surfaceDestroyed(SurfaceHolder holder) {
+				if (player != null) {
+					player.release();
+					player = null;
+				}
+			}
+
+			@Override
+			public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+			}
+		});
+
+		WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+		lp.copyFrom(dialog.getWindow().getAttributes());
+		lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+		lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+
+		dialog.setContentView(main);
+		dialog.show();
+		dialog.getWindow().setAttributes(lp);
+	}
+
+	@Override
+	public boolean onError(MediaPlayer mp, int what, int extra) {
+		Log.e(LOG_TAG, "AudioPlayer.onError(" + what + ", " + extra + ")");
+
+		JSONObject event = new JSONObject();
+		try {
+			event.put("type", "error");
+			event.put("what", what);
+			event.put("extra", extra);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event);
+		errorResult.setKeepCallback(false);
+		callbackContext.sendPluginResult(errorResult);
+
+		mp.stop();
+		mp.release();
+		dialog.dismiss();
+
+		dialog = null;
+		player = null;
+		videoView = null;
+		callbackContext = null;
+
+		return false;
+	}
+
+	@Override
+	public void onPrepared(MediaPlayer mp) {
+		JSONObject event = new JSONObject();
+		try {
+			event.put("type", "prepared");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event);
+		errorResult.setKeepCallback(true);
+		callbackContext.sendPluginResult(errorResult);
+
+		mp.start();
+	}
+
+	@Override
+	public void onCompletion(MediaPlayer mp) {
+		JSONObject event = new JSONObject();
+		try {
+			event.put("type", "completed");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event);
+		errorResult.setKeepCallback(false);
+		callbackContext.sendPluginResult(errorResult);
+
+		mp.stop();
+		mp.release();
+		dialog.dismiss();
+
+		dialog = null;
+		player = null;
+		videoView = null;
+		callbackContext = null;
+	}
+
+	public boolean pause() {
+		if (this.player != null) {
+			this.player.pause();
+
+			JSONObject event = new JSONObject();
+			try {
+				event.put("type", "paused");
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
-            PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event);
-            errorResult.setKeepCallback(false);
-            callbackContext.sendPluginResult(errorResult);
+			PluginResult eventResult = new PluginResult(PluginResult.Status.OK, event);
+			eventResult.setKeepCallback(true);
+			callbackContext.sendPluginResult(eventResult);
 
-	        mp.stop();
-	        mp.release();
-	        dialog.dismiss();
-	        
-	        dialog = null;
-	        player = null;
-	        videoView = null;
-	        callbackContext = null;
-            
-	        return false;
-	    }
-	
-	    @Override
-	    public void onPrepared(MediaPlayer mp) {
-	        JSONObject event = new JSONObject();
-	        try {
-				event.put("type", "prepared");
+			return true;
+		}
+		return false;
+	}
+
+	public boolean resume() {
+		if (this.player != null) {
+			this.player.start();
+
+			JSONObject event = new JSONObject();
+			try {
+				event.put("type", "playing");
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	        
-            PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event);
-            errorResult.setKeepCallback(true);
-            callbackContext.sendPluginResult(errorResult);
-            
-	        mp.start();
-	    }
-	
-	    @Override
-	    public void onCompletion(MediaPlayer mp) {
-	        JSONObject event = new JSONObject();
-	        try {
+
+			PluginResult eventResult = new PluginResult(PluginResult.Status.OK, event);
+			eventResult.setKeepCallback(true);
+			callbackContext.sendPluginResult(eventResult);
+
+			return true;
+		}
+		return false;
+	}
+	public boolean stop() {
+		if (player != null) {
+			JSONObject event = new JSONObject();
+			try {
 				event.put("type", "completed");
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	        
-            PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event);
-            errorResult.setKeepCallback(false);
-            callbackContext.sendPluginResult(errorResult);
 
-	        mp.stop();
-	        mp.release();
-	        dialog.dismiss();
-	        
-	        dialog = null;
-	        player = null;
-	        videoView = null;
-	        callbackContext = null;
-	    }
-	
-	    public void stop(CallbackContext stopContext) {
-	    	if (player!=null) {
-		        JSONObject event = new JSONObject();
-		        try {
-					event.put("type", "completed");
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-		        
-	            PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event);
-	            errorResult.setKeepCallback(false);
-	            callbackContext.sendPluginResult(errorResult);
+			PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event);
+			errorResult.setKeepCallback(false);
+			callbackContext.sendPluginResult(errorResult);
 
-            	if (player!=null) {
-    		        player.stop();
-    		        player.release();
-                    player = null;
-            	}
-            	if (dialog!=null) {
-			        dialog.dismiss();
-			        dialog=null;
-            	}
-            	
-		        videoView = null;
-		        callbackContext = null;
+			if (player != null) {
+				player.stop();
+				player.release();
+				player = null;
+			}
+			if (dialog != null) {
+				dialog.dismiss();
+				dialog = null;
+			}
 
-		        stopContext.success();
-	    	} else {
-		        stopContext.success();
-	    	}
-	        
-	    }
+			videoView = null;
+			callbackContext = null;
+
+			return true;
+		}
+		return false;
+	}
 }
