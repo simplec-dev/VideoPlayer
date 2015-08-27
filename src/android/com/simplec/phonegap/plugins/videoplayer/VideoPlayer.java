@@ -128,8 +128,10 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 	}
 
 	public boolean play(CordovaArgs args, final CallbackContext callbackContext)  {
+		Log.v(LOG_TAG, "stopping if necessary");
 		stop();
-		
+
+		Log.v(LOG_TAG, "playing");
 		try {
 			CordovaResourceApi resourceApi = webView.getResourceApi();
 			String target = args.getString(0);
@@ -152,8 +154,10 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 
 			Log.v(LOG_TAG, fileUriStr);
 
+			Log.v(LOG_TAG, "playing file: "+fileUriStr);
 			File f = new File(fileUriStr);
 			if (!f.exists()) {
+				Log.v(LOG_TAG, "does not exist: "+fileUriStr);
 				callbackContext.error("video does not exist");
 				return true;
 			}
@@ -164,6 +168,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			// Create dialog in new thread
 			cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
+					Log.v(LOG_TAG, "openVideoDialog");
 					openVideoDialog(path, options, callbackContext);
 				}
 			});
@@ -214,6 +219,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			}
 		} else {
 			try {
+				Log.v(LOG_TAG, "setDataSource file");
 				player.setDataSource(path);
 			} catch (Exception e) {
 				callbackContext.error(e.getLocalizedMessage());
@@ -249,9 +255,11 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		mHolder.addCallback(new SurfaceHolder.Callback() {
 			@Override
 			public void surfaceCreated(SurfaceHolder holder) {
+				Log.v(LOG_TAG, "surfaceCreated");
 				if (player != null) {
 					player.setDisplay(holder);
 					try {
+						Log.v(LOG_TAG, "preparing player");
 						player.prepare();
 					} catch (Exception e) {
 						callbackContext.error(e.getLocalizedMessage());
@@ -261,6 +269,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 
 			@Override
 			public void surfaceDestroyed(SurfaceHolder holder) {
+				Log.v(LOG_TAG, "surfaceDestroyed");
 				if (player != null) {
 					player.release();
 					player = null;
@@ -314,6 +323,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 
 	@Override
 	public void onPrepared(MediaPlayer mp) {
+		Log.v(LOG_TAG, "onPrepared");
 		JSONObject event = new JSONObject();
 		try {
 			event.put("type", "prepared");
@@ -326,11 +336,13 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		errorResult.setKeepCallback(true);
 		callbackContext.sendPluginResult(errorResult);
 
+		Log.v(LOG_TAG, "starting video");
 		mp.start();
 	}
 
 	@Override
 	public void onCompletion(MediaPlayer mp) {
+		Log.v(LOG_TAG, "onCompletion");
 		JSONObject event = new JSONObject();
 		try {
 			event.put("type", "completed");
