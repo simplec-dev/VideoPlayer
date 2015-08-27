@@ -14,13 +14,13 @@
 
 var exec = require("cordova/exec");
 
-var VideoPlayer = {
-	    play: function(url) {
-	        exec(null, null, "VideoPlayer", "play", [url]);
+var VideoPlayer = {		
+	    play: function(url, success, failure) {
+	        exec(success, failure, "VideoPlayer", "play", [url]);
 	    },
 
-	    stop: function(url) {
-	        exec(null, null, "VideoPlayer", "stop", [url]);
+	    stop: function(success, failure) {
+	        exec(success, failure, "VideoPlayer", "stop", []);
 	    }
 };
 

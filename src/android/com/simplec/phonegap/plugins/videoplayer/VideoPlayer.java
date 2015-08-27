@@ -6,6 +6,8 @@
 
 package com.simplec.phonegap.plugins.videoplayer;
 
+import java.io.File;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaArgs;
 import org.apache.cordova.CordovaPlugin;
@@ -75,6 +77,12 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
             }
 
             Log.v(LOG_TAG, fileUriStr);
+            
+            File f = new File(fileUriStr);
+            if (!f.exists()) {
+            	callbackContext.error("video does not exist");
+            	return true;
+            }
 
             final String path = stripFileProtocol(fileUriStr);
 
