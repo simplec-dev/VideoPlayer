@@ -86,14 +86,11 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
                 }
             });
 
-            callbackContext.success();
-
             return true;
         }
         if (action.equals("stop")) {
             Log.v(LOG_TAG, "stopping");
         	stop(callbackContext);
-        	callbackContext.success();
         	return true;
         }
         return false;
@@ -188,16 +185,21 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
         mHolder.addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-                player.setDisplay(holder);
-                try {
-                    player.prepare();
-                } catch (Exception e) {
-                    callbackContext.error(e.getLocalizedMessage());
-                }
+            	if (player!=null) {
+	                player.setDisplay(holder);
+	                try {
+	                    player.prepare();
+	                } catch (Exception e) {
+	                    callbackContext.error(e.getLocalizedMessage());
+	                }
+            	}
             }
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
-                player.release();
+            	if (player!=null) {
+                    player.release();
+                    player = null;
+            	}
             }
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
@@ -297,13 +299,17 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 	            PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event.toString());
 	            errorResult.setKeepCallback(false);
 	            callbackContext.sendPluginResult(errorResult);
-	
-		        player.stop();
-		        player.release();
-		        dialog.dismiss();
-		        
-		        dialog = null;
-		        player = null;
+
+            	if (player!=null) {
+    		        player.stop();
+    		        player.release();
+                    player = null;
+            	}
+            	if (dialog!=null) {
+			        dialog.dismiss();
+			        dialog=null;
+            	}
+            	
 		        videoView = null;
 		        callbackContext = null;
 
