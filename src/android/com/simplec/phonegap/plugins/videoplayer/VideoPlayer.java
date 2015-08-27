@@ -236,8 +236,8 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	        
-            PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event.toString());
+
+            PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event);
             errorResult.setKeepCallback(false);
             callbackContext.sendPluginResult(errorResult);
 
@@ -263,7 +263,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 				e.printStackTrace();
 			}
 	        
-            PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event.toString());
+            PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event);
             errorResult.setKeepCallback(true);
             callbackContext.sendPluginResult(errorResult);
             
@@ -280,7 +280,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 				e.printStackTrace();
 			}
 	        
-            PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event.toString());
+            PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event);
             errorResult.setKeepCallback(false);
             callbackContext.sendPluginResult(errorResult);
 
@@ -304,7 +304,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 					e.printStackTrace();
 				}
 		        
-	            PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event.toString());
+	            PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event);
 	            errorResult.setKeepCallback(false);
 	            callbackContext.sendPluginResult(errorResult);
 
