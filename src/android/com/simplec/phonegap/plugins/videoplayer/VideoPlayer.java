@@ -155,14 +155,15 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			Log.v(LOG_TAG, fileUriStr);
 
 			Log.v(LOG_TAG, "playing file: "+fileUriStr);
-			File f = new File(fileUriStr);
+
+			final String path = stripFileProtocol(fileUriStr);
+
+			File f = new File(path);
 			if (!f.exists()) {
 				Log.v(LOG_TAG, "does not exist: "+fileUriStr);
 				callbackContext.error("video does not exist");
 				return true;
 			}
-
-			final String path = stripFileProtocol(fileUriStr);
 
 			Log.v(LOG_TAG, "playing path: " + path);
 			// Create dialog in new thread
