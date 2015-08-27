@@ -323,7 +323,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 
 		        stopContext.success();
 	    	} else {
-	    		stopContext.error("player does not exist");
+		        stopContext.success();
 	    	}
 	        
 	    }
