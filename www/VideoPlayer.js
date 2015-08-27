@@ -15,9 +15,13 @@
 var exec = require("cordova/exec");
 
 var VideoPlayer = {
-    play: function(url) {
-        exec(null, null, "VideoPlayer", "playVideo", [url]);
-    }
+	    play: function(url) {
+	        exec(null, null, "VideoPlayer", "play", [url]);
+	    },
+
+	    stop: function(url) {
+	        exec(null, null, "VideoPlayer", "stop", [url]);
+	    }
 };
 
 module.exports = VideoPlayer;
