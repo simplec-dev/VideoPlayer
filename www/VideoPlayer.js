@@ -16,7 +16,15 @@ var exec = require("cordova/exec");
 
 var VideoPlayer = {		
 	    play: function(url, success, failure) {
-	        exec(success, failure, "VideoPlayer", "play", [url]);
+	    	if (url) {
+		        exec(success, failure, "VideoPlayer", "play", [url]);
+	    	} else {
+		        exec(success, failure, "VideoPlayer", "play", []);
+	    	}
+	    },
+	    
+	    resume: function(url, success, failure) {
+		    exec(success, failure, "VideoPlayer", "play", []);
 	    },
 
 	    stop: function(success, failure) {
