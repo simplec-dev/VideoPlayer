@@ -251,8 +251,11 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 				case MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING:
 					player.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
 					break;
-				default:
+				case MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT:
 					player.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
+					break;
+				default:
+					player.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
 				}
 			} catch (Exception e) {
 				callbackContext.error(e.getLocalizedMessage());
