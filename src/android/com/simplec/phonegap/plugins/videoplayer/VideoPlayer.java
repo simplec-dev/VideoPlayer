@@ -206,16 +206,19 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		
 		int w = dialog.getWindow().getDecorView().getWidth();
 		int h = dialog.getWindow().getDecorView().getHeight();
+		Log.v(LOG_TAG, "width: "+w);
+		Log.v(LOG_TAG, "height: "+h);
 
 		// Main container layout
 		LinearLayout main = new LinearLayout(cordova.getActivity());
+		main.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		main.setLayoutParams(new LinearLayout.LayoutParams(w/2, h));
-		main.setOrientation(LinearLayout.VERTICAL);
+	//	main.setOrientation(LinearLayout.VERTICAL);
 		main.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
 		main.setVerticalGravity(Gravity.CENTER_VERTICAL);
 
 		videoView = new VideoView(cordova.getActivity());
-		videoView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		videoView.setLayoutParams(new LinearLayout.LayoutParams(w/2, h));
 		// videoView.setVideoURI(uri);
 		// videoView.setVideoPath(path);
 		main.addView(videoView);
