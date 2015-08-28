@@ -191,39 +191,10 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			return false;
 		}
 	}
-	
-	private int scale = 0;
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	protected void openVideoDialog(String path, JSONObject options, final CallbackContext callbackContext) {
 		this.callbackContext = callbackContext;
-
-		// Let's create the main dialog
-		dialog = new Dialog(cordova.getActivity(), android.R.style.Theme_NoTitleBar);
-		dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
-		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		dialog.setCancelable(true);
-
-		Log.v(LOG_TAG, "getting dimensions");
-		int w = dialog.getWindow().getDecorView().getWidth();
-		int h = dialog.getWindow().getDecorView().getHeight();
-		w = 500;
-		h = 500;
-		Log.v(LOG_TAG, "width: "+w);
-		Log.v(LOG_TAG, "height: "+h);
-
-		// Main container layout
-		LinearLayout main = new LinearLayout(cordova.getActivity());
-		main.setLayoutParams(new LinearLayout.LayoutParams(w/2, h));
-	//	main.setOrientation(LinearLayout.VERTICAL);
-		main.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
-		main.setVerticalGravity(Gravity.CENTER_VERTICAL);
-
-		videoView = new VideoView(cordova.getActivity());
-		videoView.setLayoutParams(new LinearLayout.LayoutParams(w/2, h));
-		// videoView.setVideoURI(uri);
-		// videoView.setVideoPath(path);
-		main.addView(videoView);
 
 		player = new MediaPlayer();
 		player.setOnPreparedListener(this);
@@ -250,6 +221,33 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			}
 		}
 
+		// Let's create the main dialog
+		dialog = new Dialog(cordova.getActivity(), android.R.style.Theme_NoTitleBar);
+		dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
+		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		dialog.setCancelable(true);
+
+		Log.v(LOG_TAG, "getting dimensions");
+		int w = dialog.getWindow().getDecorView().getWidth();
+		int h = dialog.getWindow().getDecorView().getHeight();
+		w = player.getVideoWidth();
+		h = player.getVideoHeight();
+		Log.v(LOG_TAG, "width: "+w);
+		Log.v(LOG_TAG, "height: "+h);
+
+		// Main container layout
+		LinearLayout main = new LinearLayout(cordova.getActivity());
+		main.setLayoutParams(new LinearLayout.LayoutParams(w, h));
+	//	main.setOrientation(LinearLayout.VERTICAL);
+		main.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
+		main.setVerticalGravity(Gravity.CENTER_VERTICAL);
+
+		videoView = new VideoView(cordova.getActivity());
+		videoView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+		// videoView.setVideoURI(uri);
+		// videoView.setVideoPath(path);
+		main.addView(videoView);
+
 		try {
 			float volume = Float.valueOf(options.getString("volume"));
 			player.setVolume(volume, volume);
@@ -263,8 +261,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			try {
 				scalingMode = options.getInt("scalingMode");
 			} catch (Exception e) {
-				scalingMode = scale % 2 + 1;
-				scale++;
+				scalingMode = 0;
 			}
 			Log.v(LOG_TAG, "Scaling: "+scalingMode);
 
@@ -276,7 +273,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 				player.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
 				break;
 			default:
-				player.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
+				player.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
 			}
 		}
 
