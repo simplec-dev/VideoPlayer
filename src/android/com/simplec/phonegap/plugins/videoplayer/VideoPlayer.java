@@ -187,6 +187,8 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			return false;
 		}
 	}
+	
+	private int scale = 0;
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	protected void openVideoDialog(String path, JSONObject options, final CallbackContext callbackContext) {
@@ -249,7 +251,8 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			try {
 				scalingMode = options.getInt("scalingMode");
 			} catch (Exception e) {
-				scalingMode = 0;
+				scalingMode = scale % 2 + 1;
+				scale++;
 			}
 			Log.v(LOG_TAG, "Scaling: "+scalingMode);
 
