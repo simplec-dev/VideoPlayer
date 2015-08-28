@@ -63,7 +63,15 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			return true;
 		}
 		if (action.equals(PLAY)) {
-			if (this.player != null) {
+			String target = null;
+			
+			try {
+				target = args.getString(0);
+			} catch (Exception e) {
+				target = null;
+			}
+			
+			if (target==null && this.player != null) {
 				resume();
 				return true;
 			}
