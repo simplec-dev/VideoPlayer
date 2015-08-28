@@ -7,6 +7,7 @@
 package com.simplec.phonegap.plugins.videoplayer;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaArgs;
@@ -19,6 +20,8 @@ import org.json.JSONObject;
 import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.res.AssetFileDescriptor;
+import android.graphics.Matrix;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
@@ -31,10 +34,11 @@ import android.view.SurfaceHolder;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.VideoView;
 
-public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, OnPreparedListener, OnErrorListener {
+public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, OnPreparedListener, OnErrorListener  {
 
 	protected static final String LOG_TAG = "VideoPlayer";
 
@@ -199,10 +203,13 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
 		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		dialog.setCancelable(true);
+		
+		int w = dialog.getWindow().getDecorView().getWidth();
+		int h = dialog.getWindow().getDecorView().getHeight();
 
 		// Main container layout
 		LinearLayout main = new LinearLayout(cordova.getActivity());
-		main.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		main.setLayoutParams(new LinearLayout.LayoutParams(w/2, h));
 		main.setOrientation(LinearLayout.VERTICAL);
 		main.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
 		main.setVerticalGravity(Gravity.CENTER_VERTICAL);
@@ -455,5 +462,20 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			return true;
 		}
 		return false;
+	}
+
+	float mVideoHeight;
+	float mVideoWidth;
+	private void calculateVideoSize(String src) {
+	    try {
+	        MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
+	        metaRetriever.setDataSource(src);
+	        String height = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+	        String width = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+	        mVideoHeight = Float.parseFloat(height);
+	        mVideoWidth = Float.parseFloat(width);
+	    } catch (NumberFormatException e) {
+	        Log.d(LOG_TAG, e.getMessage());
+	    }
 	}
 }
