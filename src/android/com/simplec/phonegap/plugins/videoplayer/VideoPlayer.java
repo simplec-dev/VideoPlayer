@@ -203,7 +203,8 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
 		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		dialog.setCancelable(true);
-		
+
+		Log.v(LOG_TAG, "getting dimensions");
 		int w = dialog.getWindow().getDecorView().getWidth();
 		int h = dialog.getWindow().getDecorView().getHeight();
 		Log.v(LOG_TAG, "width: "+w);
@@ -211,7 +212,6 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 
 		// Main container layout
 		LinearLayout main = new LinearLayout(cordova.getActivity());
-		main.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		main.setLayoutParams(new LinearLayout.LayoutParams(w/2, h));
 	//	main.setOrientation(LinearLayout.VERTICAL);
 		main.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
