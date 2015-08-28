@@ -207,6 +207,8 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		Log.v(LOG_TAG, "getting dimensions");
 		int w = dialog.getWindow().getDecorView().getWidth();
 		int h = dialog.getWindow().getDecorView().getHeight();
+		w = 500;
+		h = 500;
 		Log.v(LOG_TAG, "width: "+w);
 		Log.v(LOG_TAG, "height: "+h);
 
