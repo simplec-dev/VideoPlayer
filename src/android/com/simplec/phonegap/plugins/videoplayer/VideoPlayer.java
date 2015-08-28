@@ -246,8 +246,8 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		dialog.setCancelable(true);
 
 		Log.v(LOG_TAG, "getting dimensions");
-		int w = (int)mVideoHeight;
-		int h = (int)mVideoWidth;
+		int h = (int)mVideoHeight;
+		int w = (int)mVideoWidth;
 		Log.v(LOG_TAG, "width: "+w);
 		Log.v(LOG_TAG, "height: "+h);
 
