@@ -196,6 +196,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 	protected void openVideoDialog(String path, JSONObject options, final CallbackContext callbackContext) {
 		this.callbackContext = callbackContext;
 
+        MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
 		player = new MediaPlayer();
 		player.setOnPreparedListener(this);
 		player.setOnCompletionListener(this);
@@ -207,6 +208,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			try {
 				fd = cordova.getActivity().getAssets().openFd(f);
 				player.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
+				metaRetriever.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
 			} catch (Exception e) {
 				callbackContext.error(e.getLocalizedMessage());
 				Log.v(LOG_TAG, "error: " + e.getLocalizedMessage());
@@ -215,11 +217,27 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			try {
 				Log.v(LOG_TAG, "setDataSource file");
 				player.setDataSource(path);
+				metaRetriever.setDataSource(path);
 			} catch (Exception e) {
 				callbackContext.error(e.getLocalizedMessage());
 				Log.v(LOG_TAG, "error: " + e.getLocalizedMessage());
 			}
 		}
+
+		double mVideoHeight = 0;
+		double mVideoWidth = 0;
+	    try {
+	        String height = metaRetriever
+	                .extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+	        String width = metaRetriever
+	                .extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+	        mVideoHeight = Float.parseFloat(height);
+	        mVideoWidth = Float.parseFloat(width);
+	    } catch (NumberFormatException e) {
+	    	mVideoHeight = 900;
+	    	mVideoWidth = 1600;
+	        Log.d(LOG_TAG, e.getMessage());
+	    }
 
 		// Let's create the main dialog
 		dialog = new Dialog(cordova.getActivity(), android.R.style.Theme_NoTitleBar);
@@ -228,10 +246,8 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		dialog.setCancelable(true);
 
 		Log.v(LOG_TAG, "getting dimensions");
-		int w = dialog.getWindow().getDecorView().getWidth();
-		int h = dialog.getWindow().getDecorView().getHeight();
-		w = player.getVideoWidth();
-		h = player.getVideoHeight();
+		int w = (int)mVideoHeight;
+		int h = (int)mVideoWidth;
 		Log.v(LOG_TAG, "width: "+w);
 		Log.v(LOG_TAG, "height: "+h);
 
