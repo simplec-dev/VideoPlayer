@@ -47,14 +47,13 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 	private MediaPlayer player;
 	private CallbackContext callbackContext;
 
-
 	public final static String PAUSE = "pause";
 	public final static String PLAY = "play";
 	public final static String STOP = "stop";
 	public final static String DURATION = "duration";
 	public final static String SEEK = "seek";
 	public final static String PLAYING = "playing";
-	
+
 	public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext)
 			throws JSONException {
 		Log.v(LOG_TAG, "got command: " + action);
@@ -64,18 +63,18 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		}
 		if (action.equals(PLAY)) {
 			String target = null;
-			
+
 			try {
 				target = args.getString(0);
 			} catch (Exception e) {
 				target = null;
 			}
-			
-			if (target==null && this.player != null) {
+
+			if (target == null && this.player != null) {
 				resume();
 				return true;
 			}
-			
+
 			play(args, callbackContext);
 
 			return true;
@@ -86,29 +85,29 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			return true;
 		}
 		if (action.equals(PLAYING)) {
-			if (player!=null) {
-				callbackContext.success(player.isPlaying()?1:0);
+			if (player != null) {
+				callbackContext.success(player.isPlaying() ? 1 : 0);
 			} else {
 				callbackContext.error("no player");
 			}
 			return true;
 		}
 		if (action.equals(DURATION)) {
-			if (player!=null) {
+			if (player != null) {
 				callbackContext.success(player.getDuration() / 1000);
 			} else {
 				callbackContext.error("no player");
 			}
 			return true;
 		}
-		if (action.equals(SEEK)) {			
-			if (player!=null) {
+		if (action.equals(SEEK)) {
+			if (player != null) {
 				int sec = args.getInt(0);
-				int msec = sec*1000;
-				if (msec<0) {
-					msec = player.getDuration()-1;
+				int msec = sec * 1000;
+				if (msec < 0) {
+					msec = player.getDuration() - 1;
 				}
-				
+
 				player.seekTo(msec);
 				callbackContext.success();
 			} else {
@@ -135,7 +134,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		return uriString;
 	}
 
-	public boolean play(CordovaArgs args, final CallbackContext callbackContext)  {
+	public boolean play(CordovaArgs args, final CallbackContext callbackContext) {
 		Log.v(LOG_TAG, "stopping if necessary");
 		stop();
 
@@ -162,13 +161,13 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 
 			Log.v(LOG_TAG, fileUriStr);
 
-			Log.v(LOG_TAG, "playing file: "+fileUriStr);
+			Log.v(LOG_TAG, "playing file: " + fileUriStr);
 
 			final String path = stripFileProtocol(fileUriStr);
 
 			File f = new File(path);
 			if (!f.exists()) {
-				Log.v(LOG_TAG, "does not exist: "+fileUriStr);
+				Log.v(LOG_TAG, "does not exist: " + fileUriStr);
 				callbackContext.error("video does not exist");
 				return true;
 			}
@@ -188,6 +187,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			return false;
 		}
 	}
+
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	protected void openVideoDialog(String path, JSONObject options, final CallbackContext callbackContext) {
 		this.callbackContext = callbackContext;
@@ -245,20 +245,22 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		}
 
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+			int scalingMode = 0;
 			try {
-				int scalingMode = options.getInt("scalingMode");
-				switch (scalingMode) {
-				case MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING:
-					player.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
-					break;
-				case MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT:
-					player.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
-					break;
-				default:
-					player.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
-				}
+				scalingMode = options.getInt("scalingMode");
 			} catch (Exception e) {
-				callbackContext.error(e.getLocalizedMessage());
+				scalingMode = 0;
+			}
+
+			switch (scalingMode) {
+			case MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING:
+				player.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
+				break;
+			case MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT:
+				player.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
+				break;
+			default:
+				player.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
 			}
 		}
 
@@ -418,6 +420,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		}
 		return false;
 	}
+
 	public boolean stop() {
 		if (player != null) {
 			JSONObject event = new JSONObject();
