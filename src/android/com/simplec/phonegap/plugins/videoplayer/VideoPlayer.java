@@ -291,6 +291,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		videoView.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
+				Log.v(LOG_TAG, "onTouch ");
 				if (videoView.isPlaying()) {
 					player.pause();
 					videoView.pause();
@@ -299,6 +300,19 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 					player.start();
 				}
 				return false;
+			}
+		});
+		videoView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.v(LOG_TAG, "onClick ");
+				if (videoView.isPlaying()) {
+					player.pause();
+					videoView.pause();
+				} else {
+					videoView.start();
+					player.start();
+				}
 			}
 		});
 		
