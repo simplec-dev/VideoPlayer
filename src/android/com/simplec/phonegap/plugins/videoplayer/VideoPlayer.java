@@ -45,7 +45,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 	protected static final String ASSETS = "/android_asset/";
 	protected static final String FILE = "file://";
 
-	private boolean startPlaying = true;
+	private boolean prepared = false;
 	private Dialog dialog;
 	private VideoView videoView;
 	private MediaPlayer player;
@@ -324,7 +324,10 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 					player.setDisplay(holder);
 					try {
 						Log.v(LOG_TAG, "preparing player");
-						player.prepare();
+						if (!prepared) {
+							player.prepare();
+						}
+						
 					} catch (Exception e) {
 						callbackContext.error(e.getLocalizedMessage());
 					}
@@ -335,8 +338,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			public void surfaceDestroyed(SurfaceHolder holder) {
 				Log.v(LOG_TAG, "surfaceDestroyed");
 				if (player != null) {
-					player.release();
-					player = null;
+					// don't destroy the player
 				}
 			}
 
@@ -377,6 +379,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		mp.release();
 		dialog.dismiss();
 
+		prepared = false;
 		dialog = null;
 		player = null;
 		videoView = null;
@@ -423,6 +426,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		mp.release();
 		dialog.dismiss();
 
+		prepared = false;
 		dialog = null;
 		player = null;
 		videoView = null;
@@ -496,6 +500,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 				dialog = null;
 			}
 
+			prepared = false;
 			videoView = null;
 			callbackContext = null;
 
