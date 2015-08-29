@@ -506,19 +506,24 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 
 	@Override
 	public void onPause(boolean multitasking) {
-		// TODO Auto-generated method stub
+		Log.v(LOG_TAG, "ON PAUSE");
+		
 		super.onPause(multitasking);
 		
 		if (videoView!=null) {
 			videoView.pause();
+			videoView.suspend();
 		}
 	}
 
 	@Override
 	public void onResume(boolean multitasking) {
+		Log.v(LOG_TAG, "ON RESUME");
+		
 		super.onResume(multitasking);
 		if (videoView!=null) {
 			videoView.resume();
+			videoView.start();
 		}
 	}
 	
