@@ -268,6 +268,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 
 		// Main container layout
 		LinearLayout main = new LinearLayout(cordova.getActivity());
+		main.setBackgroundColor(color.black);
 		main.setLayoutParams(new LinearLayout.LayoutParams(w, h));
 	//	main.setOrientation(LinearLayout.VERTICAL);
 		main.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
@@ -279,7 +280,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		// videoView.setVideoURI(uri);
 		// videoView.setVideoPath(path);
 		main.addView(videoView);
-
+		
 		try {
 			float volume = Float.valueOf(options.getString("volume"));
 			player.setVolume(volume, volume);
@@ -512,4 +513,19 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 	        Log.d(LOG_TAG, e.getMessage());
 	    }
 	}
+
+	@Override
+	public void onPause(boolean multitasking) {
+		// TODO Auto-generated method stub
+		super.onPause(multitasking);
+		this.pause();
+	}
+
+	@Override
+	public void onResume(boolean multitasking) {
+		super.onResume(multitasking);
+		this.resume();
+	}
+	
+	
 }
