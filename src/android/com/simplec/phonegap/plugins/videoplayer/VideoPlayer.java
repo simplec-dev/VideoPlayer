@@ -35,6 +35,7 @@ import android.view.SurfaceHolder;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.widget.MediaController;
 import android.widget.VideoView;
 
 public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, OnPreparedListener, OnErrorListener  {
@@ -281,6 +282,8 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		// videoView.setVideoPath(path);
 		main.addView(videoView);
 		
+		videoView.setMediaController(new MediaController(cordova.getActivity()));
+		
 		try {
 			float volume = Float.valueOf(options.getString("volume"));
 			player.setVolume(volume, volume);
@@ -504,11 +507,11 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 	@Override
 	public void onPause(boolean multitasking) {
 		// TODO Auto-generated method stub
+		super.onPause(multitasking);
+		
 		if (videoView!=null) {
 			videoView.pause();
-			videoView.suspend();
 		}
-		super.onPause(multitasking);
 	}
 
 	@Override
