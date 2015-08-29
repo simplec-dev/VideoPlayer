@@ -16,6 +16,7 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.R.color;
 import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.res.AssetFileDescriptor;
@@ -257,7 +258,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		dialog = new Dialog(cordova.getActivity(), android.R.style.Theme_NoTitleBar);
 		dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
 		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		dialog.setCancelable(true);
+		dialog.setCancelable(false);
 
 		Log.v(LOG_TAG, "getting dimensions");
 		int h = (int)mVideoHeight;
@@ -273,6 +274,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		main.setVerticalGravity(Gravity.CENTER_VERTICAL);
 
 		videoView = new VideoView(cordova.getActivity());
+		videoView.setBackgroundColor(color.black);
 		videoView.setLayoutParams(new LinearLayout.LayoutParams(w, h));
 		// videoView.setVideoURI(uri);
 		// videoView.setVideoPath(path);
