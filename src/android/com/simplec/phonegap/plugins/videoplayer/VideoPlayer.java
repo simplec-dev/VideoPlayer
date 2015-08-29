@@ -7,7 +7,6 @@
 package com.simplec.phonegap.plugins.videoplayer;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaArgs;
@@ -20,7 +19,7 @@ import org.json.JSONObject;
 import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.res.AssetFileDescriptor;
-import android.graphics.Matrix;
+import android.graphics.Point;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -29,12 +28,11 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.WindowManager.LayoutParams;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.VideoView;
 
@@ -237,6 +235,22 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 	    	mVideoHeight = 900;
 	    	mVideoWidth = 1600;
 	        Log.d(LOG_TAG, e.getMessage());
+	    }
+	    
+	    Display display = this.cordova.getActivity().getWindowManager().getDefaultDisplay();
+	    Point size = new Point();
+	    display.getSize(size);
+	    size.x = size.x * 9 / 10;
+	    size.y = size.y * 9 / 10;
+
+	    double displayAspect = ((double)size.x) / ((double)size.y);
+	    double videoAspect = ((double)mVideoWidth) / ((double)mVideoHeight);
+	    
+	    if (displayAspect>videoAspect) {
+	    	mVideoHeight = size.y;
+	    	mVideoWidth = mVideoHeight * videoAspect;
+	    } else {
+	    	mVideoWidth = mVideoHeight * displayAspect;
 	    }
 
 		// Let's create the main dialog
