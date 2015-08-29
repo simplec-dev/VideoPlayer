@@ -516,6 +516,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		super.onPause(multitasking);
 		
 		if (videoView!=null) {
+			player.pause();
 			videoView.pause();
 			videoView.suspend();
 		}
@@ -529,6 +530,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		if (videoView!=null) {
 			videoView.resume();
 			videoView.start();
+			player.start();
 		}
 	}
 	
