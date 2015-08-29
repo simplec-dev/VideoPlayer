@@ -312,6 +312,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 
 		final SurfaceHolder mHolder = videoView.getHolder();
 		mHolder.setKeepScreenOn(true);
+		mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		mHolder.addCallback(new SurfaceHolder.Callback() {
 			@Override
 			public void surfaceCreated(SurfaceHolder holder) {
@@ -448,6 +449,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 
 	public boolean resume() {
 		if (this.player != null) {
+			videoView.resume();
 			this.player.start();
 
 			JSONObject event = new JSONObject();
@@ -499,25 +501,11 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		return false;
 	}
 
-	float mVideoHeight;
-	float mVideoWidth;
-	private void calculateVideoSize(String src) {
-	    try {
-	        MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
-	        metaRetriever.setDataSource(src);
-	        String height = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
-	        String width = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
-	        mVideoHeight = Float.parseFloat(height);
-	        mVideoWidth = Float.parseFloat(width);
-	    } catch (NumberFormatException e) {
-	        Log.d(LOG_TAG, e.getMessage());
-	    }
-	}
-
 	@Override
 	public void onPause(boolean multitasking) {
 		// TODO Auto-generated method stub
 		if (videoView!=null) {
+			videoView.pause();
 			videoView.suspend();
 		}
 		super.onPause(multitasking);
