@@ -31,7 +31,9 @@ import android.os.Build;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
@@ -282,7 +284,23 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		// videoView.setVideoPath(path);
 		main.addView(videoView);
 		
-		videoView.setMediaController(new MediaController(cordova.getActivity()));
+		MediaController mediaController = new MediaController(cordova.getActivity());
+		mediaController.setAnchorView(videoView);
+		mediaController.setMediaPlayer(videoView);
+		videoView.setMediaController(mediaController);
+		videoView.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if (videoView.isPlaying()) {
+					player.pause();
+					videoView.pause();
+				} else {
+					videoView.start();
+					player.start();
+				}
+				return false;
+			}
+		});
 		
 		try {
 			float volume = Float.valueOf(options.getString("volume"));
