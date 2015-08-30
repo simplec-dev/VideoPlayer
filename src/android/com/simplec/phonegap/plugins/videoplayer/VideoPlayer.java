@@ -439,6 +439,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		mclp.gravity = Gravity.BOTTOM;
 		mc.setLayoutParams(mclp);
 		mc.setVisibility(View.VISIBLE);
+		dialog.addContentView(mc, mclp);
 
 		PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event);
 		errorResult.setKeepCallback(true);
