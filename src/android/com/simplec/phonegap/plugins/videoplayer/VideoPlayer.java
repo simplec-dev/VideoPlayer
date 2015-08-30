@@ -285,6 +285,18 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		// videoView.setVideoPath(path);
 		main.addView(videoView);
 
+
+		MediaController mc = new MediaController(cordova.getActivity());
+		mc.setAnchorView(videoView);
+		mc.setMediaPlayer(videoView);
+		videoView.setMediaController(mc);
+		FrameLayout.LayoutParams mclp = new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+		mclp.gravity = Gravity.BOTTOM;
+		mc.setLayoutParams(mclp);
+		mc.setVisibility(View.VISIBLE);
+		main.addView(mc);
+
+
 		videoView.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -430,17 +442,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		MediaController mc = new MediaController(cordova.getActivity());
-		mc.setAnchorView(videoView);
-		mc.setMediaPlayer(videoView);
-		videoView.setMediaController(mc);
-		FrameLayout.LayoutParams mclp = new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-		mclp.gravity = Gravity.BOTTOM;
-		mc.setLayoutParams(mclp);
-		mc.setVisibility(View.VISIBLE);
-		dialog.addContentView(mc, mclp);
-
+		
 		PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event);
 		errorResult.setKeepCallback(true);
 		callbackContext.sendPluginResult(errorResult);
