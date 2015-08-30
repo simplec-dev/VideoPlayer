@@ -285,6 +285,14 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		// videoView.setVideoPath(path);
 		main.addView(videoView);
 
+		videoView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+			
+			@Override
+			public void onSystemUiVisibilityChange(int visibility) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		videoView.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -426,6 +434,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		JSONObject event = new JSONObject();
 		try {
 			event.put("type", "prepared");
+			event.put("duration", player.getDuration() / 1000);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -435,12 +444,12 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		errorResult.setKeepCallback(true);
 		callbackContext.sendPluginResult(errorResult);
 
-		MediaController mc = new MediaController(cordova.getActivity());
+		/*MediaController mc = new MediaController(cordova.getActivity());
 		mc.setAnchorView(videoView);
 		mc.setMediaPlayer(videoView);
 		videoView.setMediaController(mc);
 		mc.setVisibility(View.VISIBLE);
-		//((ViewGroup)videoView.getParent()).addView(mc);
+		//((ViewGroup)videoView.getParent()).addView(mc);*/
 
 		Log.v(LOG_TAG, "starting video");
 		mp.start();
