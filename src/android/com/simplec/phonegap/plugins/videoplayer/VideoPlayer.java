@@ -291,6 +291,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		mc.setMediaPlayer(videoView);
 		videoView.setMediaController(mc);
 		mc.setVisibility(View.VISIBLE);
+		((ViewGroup)videoView.getParent()).removeView(mc);
 		main.addView(mc);
 
 
