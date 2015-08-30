@@ -34,13 +34,16 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.FrameLayout.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
-public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, OnPreparedListener, OnErrorListener  {
+public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, OnPreparedListener, OnErrorListener {
 
 	protected static final String LOG_TAG = "VideoPlayer";
 
@@ -198,7 +201,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 	protected void openVideoDialog(String path, JSONObject options, final CallbackContext callbackContext) {
 		this.callbackContext = callbackContext;
 
-        MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
+		MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
 		player = new MediaPlayer();
 		player.setOnPreparedListener(this);
 		player.setOnCompletionListener(this);
@@ -228,34 +231,32 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 
 		double mVideoHeight = 0;
 		double mVideoWidth = 0;
-	    try {
-	        String height = metaRetriever
-	                .extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
-	        String width = metaRetriever
-	                .extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
-	        mVideoHeight = Float.parseFloat(height);
-	        mVideoWidth = Float.parseFloat(width);
-	    } catch (NumberFormatException e) {
-	    	mVideoHeight = 900;
-	    	mVideoWidth = 1600;
-	        Log.d(LOG_TAG, e.getMessage());
-	    }
-	    
-	    Display display = this.cordova.getActivity().getWindowManager().getDefaultDisplay();
-	    Point size = new Point();
-	    display.getSize(size);
-	    size.x = size.x * 9 / 10;
-	    size.y = size.y * 9 / 10;
+		try {
+			String height = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+			String width = metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+			mVideoHeight = Float.parseFloat(height);
+			mVideoWidth = Float.parseFloat(width);
+		} catch (NumberFormatException e) {
+			mVideoHeight = 900;
+			mVideoWidth = 1600;
+			Log.d(LOG_TAG, e.getMessage());
+		}
 
-	    double displayAspect = ((double)size.x) / ((double)size.y);
-	    double videoAspect = ((double)mVideoWidth) / ((double)mVideoHeight);
-	    
-	    if (displayAspect>videoAspect) {
-	    	mVideoHeight = size.y;
-	    	mVideoWidth = mVideoHeight * videoAspect;
-	    } else {
-	    	mVideoWidth = mVideoHeight * displayAspect;
-	    }
+		Display display = this.cordova.getActivity().getWindowManager().getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		size.x = size.x * 9 / 10;
+		size.y = size.y * 9 / 10;
+
+		double displayAspect = ((double) size.x) / ((double) size.y);
+		double videoAspect = ((double) mVideoWidth) / ((double) mVideoHeight);
+
+		if (displayAspect > videoAspect) {
+			mVideoHeight = size.y;
+			mVideoWidth = mVideoHeight * videoAspect;
+		} else {
+			mVideoWidth = mVideoHeight * displayAspect;
+		}
 
 		// Let's create the main dialog
 		dialog = new Dialog(cordova.getActivity(), android.R.style.Theme_NoTitleBar);
@@ -264,16 +265,16 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		dialog.setCancelable(false);
 
 		Log.v(LOG_TAG, "getting dimensions");
-		int h = (int)mVideoHeight;
-		int w = (int)mVideoWidth;
-		Log.v(LOG_TAG, "width: "+w);
-		Log.v(LOG_TAG, "height: "+h);
+		int h = (int) mVideoHeight;
+		int w = (int) mVideoWidth;
+		Log.v(LOG_TAG, "width: " + w);
+		Log.v(LOG_TAG, "height: " + h);
 
 		// Main container layout
 		LinearLayout main = new LinearLayout(cordova.getActivity());
 		main.setBackgroundColor(color.black);
 		main.setLayoutParams(new LinearLayout.LayoutParams(w, h));
-	//	main.setOrientation(LinearLayout.VERTICAL);
+		// main.setOrientation(LinearLayout.VERTICAL);
 		main.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
 		main.setVerticalGravity(Gravity.CENTER_VERTICAL);
 
@@ -284,6 +285,18 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		// videoView.setVideoPath(path);
 		main.addView(videoView);
 		
+
+		MediaController mc = new MediaController(cordova.getActivity());
+		mc.setAnchorView(videoView);
+		mc.setMediaPlayer(videoView);
+		videoView.setMediaController(mc);
+
+		FrameLayout.LayoutParams mclp = new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+		mclp.gravity = Gravity.BOTTOM;
+		mc.setLayoutParams(mclp);
+		((ViewGroup) mc.getParent()).removeView(mc);
+		main.addView(mc);
+
 		videoView.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -313,7 +326,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 				}
 			}
 		});
-		
+
 		try {
 			float volume = Float.valueOf(options.getString("volume"));
 			player.setVolume(volume, volume);
@@ -329,7 +342,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			} catch (Exception e) {
 				scalingMode = 0;
 			}
-			Log.v(LOG_TAG, "Scaling: "+scalingMode);
+			Log.v(LOG_TAG, "Scaling: " + scalingMode);
 
 			switch (scalingMode) {
 			case MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING:
@@ -358,7 +371,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 							player.prepare();
 							prepared = true;
 						}
-						
+
 					} catch (Exception e) {
 						callbackContext.error(e.getLocalizedMessage());
 					}
@@ -434,11 +447,6 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		errorResult.setKeepCallback(true);
 		callbackContext.sendPluginResult(errorResult);
 
-		MediaController mediaController = new MediaController(cordova.getActivity());
-		mediaController.setAnchorView(videoView);
-		mediaController.setMediaPlayer(videoView);
-		videoView.setMediaController(mediaController);
-		
 		Log.v(LOG_TAG, "starting video");
 		mp.start();
 	}
@@ -548,10 +556,10 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 	@Override
 	public void onPause(boolean multitasking) {
 		Log.v(LOG_TAG, "ON PAUSE");
-		
+
 		super.onPause(multitasking);
-		
-		if (videoView!=null) {
+
+		if (videoView != null) {
 			player.pause();
 			videoView.pause();
 			videoView.suspend();
@@ -561,14 +569,13 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 	@Override
 	public void onResume(boolean multitasking) {
 		Log.v(LOG_TAG, "ON RESUME");
-		
+
 		super.onResume(multitasking);
-		if (videoView!=null) {
+		if (videoView != null) {
 			videoView.resume();
 			videoView.start();
 			player.start();
 		}
 	}
-	
-	
+
 }
