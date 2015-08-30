@@ -435,9 +435,10 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		mc.setAnchorView(videoView);
 		mc.setMediaPlayer(videoView);
 		videoView.setMediaController(mc);
-	//	FrameLayout.LayoutParams mclp = new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-	//	mclp.gravity = Gravity.BOTTOM;
-	//	mc.setLayoutParams(mclp);
+		FrameLayout.LayoutParams mclp = new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+		mclp.gravity = Gravity.BOTTOM;
+		mc.setLayoutParams(mclp);
+		((ViewGroup)videoView.getParent()).addView(mc);
 		mc.setVisibility(View.VISIBLE);
 
 		PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event);
