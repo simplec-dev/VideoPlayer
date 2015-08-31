@@ -31,6 +31,7 @@ import android.os.Build;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
@@ -344,6 +345,28 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 				}
 			}
 		});
+		videoView.setOnKeyListener(new View.OnKeyListener() {
+			@Override
+			public boolean onKey(View v, int keyCode, KeyEvent keyEvent) {
+				Log.v(LOG_TAG, "onKey keyCode="+keyCode+"  evt.keycode"+keyEvent.getKeyCode()+"  evt.flags"+keyEvent.getFlags());
+
+				JSONObject event = new JSONObject();
+				try {
+					event.put("type", "key");
+					event.put("keyCode", keyCode);
+					event.put("flags", keyEvent.getFlags());
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event);
+				errorResult.setKeepCallback(true);
+				callbackContext.sendPluginResult(errorResult);
+				
+				return webView.onKeyDown(keyCode, keyEvent);
+			}
+		});
 
 		try {
 			float volume = Float.valueOf(options.getString("volume"));
@@ -407,7 +430,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 			}
 		});
-
+		
 		WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
 		lp.copyFrom(dialog.getWindow().getAttributes());
 		lp.width = WindowManager.LayoutParams.MATCH_PARENT;
