@@ -351,7 +351,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 				Log.v(LOG_TAG, "onKey keyCode="+keyCode+"  evt.keycode"+keyEvent.getKeyCode()+"  evt.flags"+keyEvent.getFlags());
 
 				JSONObject event = new JSONObject();
-				if (keyCode==KeyEvent.KEYCODE_BACK) {
+				/*if (keyCode==KeyEvent.KEYCODE_BACK) {
 					try {
 						event.put("type", "keypress");
 						event.put("keyCode", "back");
@@ -391,7 +391,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				} else {
+				} else {*/
 					try {
 						event.put("type", "key");
 						event.put("keyCode", keyCode);
@@ -400,13 +400,13 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				}
+				//}
 
 				PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event);
 				errorResult.setKeepCallback(true);
 				callbackContext.sendPluginResult(errorResult);
 				
-				return cordova.getActivity().onKeyDown(keyCode, keyEvent);
+				return true;
 			}
 		});
 
