@@ -34,13 +34,9 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
-import android.widget.FrameLayout.LayoutParams;
 import android.widget.LinearLayout;
-import android.widget.MediaController;
 import android.widget.VideoView;
 
 public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, OnPreparedListener, OnErrorListener {
@@ -195,7 +191,8 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 
 			return true;
 		} catch (JSONException je) {
-			callbackContext.error(je.getLocalizedMessage());
+			Log.v(LOG_TAG, "error2: " + je.getMessage());
+			callbackContext.error(je.getMessage());
 			return false;
 		}
 	}
@@ -294,7 +291,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 				player.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
 			} catch (Exception e) {
 				callbackContext.error(e.getLocalizedMessage());
-				Log.v(LOG_TAG, "error: " + e.getLocalizedMessage());
+				Log.v(LOG_TAG, "error3: " + e.getLocalizedMessage());
 			}
 		} else {
 			try {
@@ -302,7 +299,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 				player.setDataSource(path);
 			} catch (Exception e) {
 				callbackContext.error(e.getLocalizedMessage());
-				Log.v(LOG_TAG, "error: " + e.getLocalizedMessage());
+				Log.v(LOG_TAG, "error4: " + e.getLocalizedMessage());
 			}
 		}
 
@@ -348,7 +345,6 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			float volume = Float.valueOf(options.getString("volume"));
 			player.setVolume(volume, volume);
 		} catch (Exception e) {
-			callbackContext.error(e.getLocalizedMessage());
 			Log.v(LOG_TAG, "error: " + e.getLocalizedMessage());
 		}
 
