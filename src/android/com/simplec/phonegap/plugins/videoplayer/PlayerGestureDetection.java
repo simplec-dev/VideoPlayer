@@ -17,21 +17,17 @@ public class PlayerGestureDetection extends SimpleOnGestureListener {
 
 	private final static int ACTION_FAKE = -13; // just an unlikely number
 	private int swipe_Min_Distance = 50;
-	private int swipe_Max_Distance = 350;
+	private int swipe_Max_Distance = -1;//350;
 	private int swipe_Min_Velocity = 100;
 
 	private int mode = MODE_DYNAMIC;
 	private boolean running = true;
 	private boolean tapIndicator = false;
 
-	private Activity context;
-
 	private GestureDetector detector;
 	private SimpleGestureListener listener;
 
 	public PlayerGestureDetection(Activity context, SimpleGestureListener sgl) {
-
-		this.context = context;
 		this.detector = new GestureDetector(context, this);
 		this.listener = sgl;
 	}
@@ -66,7 +62,7 @@ public class PlayerGestureDetection extends SimpleOnGestureListener {
 		final float xDistance = Math.abs(e1.getX() - e2.getX());
 		final float yDistance = Math.abs(e1.getY() - e2.getY());
 
-		if (xDistance > this.swipe_Max_Distance || yDistance > this.swipe_Max_Distance)
+		if (swipe_Max_Distance>0 && (xDistance > this.swipe_Max_Distance || yDistance > this.swipe_Max_Distance))
 			return false;
 
 		velocityX = Math.abs(velocityX);
