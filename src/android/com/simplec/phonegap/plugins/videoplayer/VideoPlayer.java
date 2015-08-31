@@ -52,7 +52,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 	private Dialog dialog;
 	private VideoView videoView;
 	private MediaPlayer player;
-	private GestureDetection detector;
+	private PlayerGestureDetection detector;
 	private CallbackContext callbackContext;
 
 	public final static String PAUSE = "pause";
@@ -281,7 +281,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		// videoView.setVideoPath(path);
 		main.addView(videoView);
 		
-		detector = new GestureDetection(cordova.getActivity(), new GestureDetection.SimpleGestureListener() {
+		detector = new PlayerGestureDetection(cordova.getActivity(), new PlayerGestureDetection.SimpleGestureListener() {
 			
 			@Override
 			public void onSwipe(int direction) {
@@ -289,16 +289,16 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 				Log.v(LOG_TAG, "  onSwipe "+direction);
 				JSONObject event = new JSONObject();
 				try {
-					if (direction==GestureDetection.SWIPE_LEFT) {
+					if (direction==PlayerGestureDetection.SWIPE_LEFT) {
 						event.put("swipe", "left");
 					}
-					if (direction==GestureDetection.SWIPE_RIGHT) {
+					if (direction==PlayerGestureDetection.SWIPE_RIGHT) {
 						event.put("swipe", "right");
 					}
-					if (direction==GestureDetection.SWIPE_UP) {
+					if (direction==PlayerGestureDetection.SWIPE_UP) {
 						event.put("swipe", "up");
 					}
-					if (direction==GestureDetection.SWIPE_DOWN) {
+					if (direction==PlayerGestureDetection.SWIPE_DOWN) {
 						event.put("swipe", "down");
 					}
 				} catch (JSONException e) {

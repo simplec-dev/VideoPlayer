@@ -5,7 +5,7 @@ import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 
-public class GestureDetection extends SimpleOnGestureListener {
+public class PlayerGestureDetection extends SimpleOnGestureListener {
 
 	public final static int SWIPE_UP = 1;
 	public final static int SWIPE_DOWN = 2;
@@ -29,7 +29,7 @@ public class GestureDetection extends SimpleOnGestureListener {
 	private GestureDetector detector;
 	private SimpleGestureListener listener;
 
-	public GestureDetection(Activity context, SimpleGestureListener sgl) {
+	public PlayerGestureDetection(Activity context, SimpleGestureListener sgl) {
 
 		this.context = context;
 		this.detector = new GestureDetector(context, this);
