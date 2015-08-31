@@ -52,7 +52,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 	private Dialog dialog;
 	private VideoView videoView;
 	private MediaPlayer player;
-	private GestureDetector detector;
+	private GestureDetection detector;
 	private CallbackContext callbackContext;
 
 	public final static String PAUSE = "pause";
@@ -281,9 +281,16 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		// videoView.setVideoPath(path);
 		main.addView(videoView);
 		
-		detector = new GestureDetector(cordova.getActivity(), new GestureDetector.OnGestureListener() {
+		detector = new GestureDetection(cordova.getActivity(), new GestureDetection.SimpleGestureListener() {
+			
 			@Override
-			public boolean onSingleTapUp(MotionEvent e) {
+			public void onSwipe(int direction) {
+				// TODO Auto-generated method stub
+				Log.v(LOG_TAG, "  onSwipe "+direction);
+			}
+			
+			@Override
+			public void onSingleTap() {
 				Log.v(LOG_TAG, "  onSingleTapUp ");
 				if (player.isPlaying()) {
 					Log.v(LOG_TAG, "  pausing ");
@@ -294,42 +301,6 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 					videoView.start();
 					player.start();
 				}
-				return false;
-			}
-			
-			@Override
-			public void onShowPress(MotionEvent e) {
-				// TODO Auto-generated method stub
-
-				Log.v(LOG_TAG, "  onShowPress ");
-			}
-			
-			@Override
-			public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-				// TODO Auto-generated method stub
-				Log.v(LOG_TAG, "  onScroll ");
-				return false;
-			}
-			
-			@Override
-			public void onLongPress(MotionEvent e) {
-				// TODO Auto-generated method stub
-
-				Log.v(LOG_TAG, "  onLongPress ");
-			}
-			
-			@Override
-			public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-				// TODO Auto-generated method stub
-				Log.v(LOG_TAG, "  onFling velocityX="+velocityX+" velocityY="+velocityY);
-				return false;
-			}
-			
-			@Override
-			public boolean onDown(MotionEvent e) {
-				// TODO Auto-generated method stub
-				Log.v(LOG_TAG, "  onDown ");
-				return false;
 			}
 		});
 
