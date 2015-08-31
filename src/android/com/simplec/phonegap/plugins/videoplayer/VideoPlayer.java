@@ -287,6 +287,28 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			public void onSwipe(int direction) {
 				// TODO Auto-generated method stub
 				Log.v(LOG_TAG, "  onSwipe "+direction);
+				JSONObject event = new JSONObject();
+				try {
+					if (direction==GestureDetection.SWIPE_LEFT) {
+						event.put("swipe", "left");
+					}
+					if (direction==GestureDetection.SWIPE_RIGHT) {
+						event.put("swipe", "right");
+					}
+					if (direction==GestureDetection.SWIPE_UP) {
+						event.put("swipe", "up");
+					}
+					if (direction==GestureDetection.SWIPE_DOWN) {
+						event.put("swipe", "down");
+					}
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event);
+			errorResult.setKeepCallback(true);
+			callbackContext.sendPluginResult(errorResult);
 			}
 			
 			@Override
