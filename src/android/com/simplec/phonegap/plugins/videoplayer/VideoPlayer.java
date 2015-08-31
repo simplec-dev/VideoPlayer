@@ -30,6 +30,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 import android.view.Display;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -51,6 +52,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 	private Dialog dialog;
 	private VideoView videoView;
 	private MediaPlayer player;
+	private GestureDetector detector;
 	private CallbackContext callbackContext;
 
 	public final static String PAUSE = "pause";
@@ -278,6 +280,58 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		// videoView.setVideoURI(uri);
 		// videoView.setVideoPath(path);
 		main.addView(videoView);
+		
+		detector = new GestureDetector(cordova.getActivity(), new GestureDetector.OnGestureListener() {
+			@Override
+			public boolean onSingleTapUp(MotionEvent e) {
+				Log.v(LOG_TAG, "  onSingleTapUp ");
+				if (player.isPlaying()) {
+					Log.v(LOG_TAG, "  pausing ");
+					player.pause();
+					videoView.pause();
+				} else {
+					Log.v(LOG_TAG, "  resuming ");
+					videoView.start();
+					player.start();
+				}
+				return false;
+			}
+			
+			@Override
+			public void onShowPress(MotionEvent e) {
+				// TODO Auto-generated method stub
+
+				Log.v(LOG_TAG, "  onShowPress ");
+			}
+			
+			@Override
+			public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+				// TODO Auto-generated method stub
+				Log.v(LOG_TAG, "  onScroll ");
+				return false;
+			}
+			
+			@Override
+			public void onLongPress(MotionEvent e) {
+				// TODO Auto-generated method stub
+
+				Log.v(LOG_TAG, "  onLongPress ");
+			}
+			
+			@Override
+			public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+				// TODO Auto-generated method stub
+				Log.v(LOG_TAG, "  onFling velocityX="+velocityX+" velocityY="+velocityY);
+				return false;
+			}
+			
+			@Override
+			public boolean onDown(MotionEvent e) {
+				// TODO Auto-generated method stub
+				Log.v(LOG_TAG, "  onDown ");
+				return false;
+			}
+		});
 
 		player = new MediaPlayer();
 		player.setOnPreparedListener(this);
@@ -320,29 +374,8 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				Log.v(LOG_TAG, "onTouch ");
-				if (player.isPlaying()) {
-					Log.v(LOG_TAG, "  pausing ");
-					player.pause();
-					videoView.pause();
-				} else {
-					Log.v(LOG_TAG, "  resuming ");
-					videoView.start();
-					player.start();
-				}
-				return false;
-			}
-		});
-		videoView.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Log.v(LOG_TAG, "onClick ");
-				if (player.isPlaying()) {
-					player.pause();
-					videoView.pause();
-				} else {
-					videoView.start();
-					player.start();
-				}
+				detector.onTouchEvent(event);
+				return true;
 			}
 		});
 		videoView.setOnKeyListener(new View.OnKeyListener() {
@@ -351,47 +384,6 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 				Log.v(LOG_TAG, "onKey keyCode="+keyCode+"  evt.keycode"+keyEvent.getKeyCode()+"  evt.flags"+keyEvent.getFlags());
 
 				JSONObject event = new JSONObject();
-				/*if (keyCode==KeyEvent.KEYCODE_BACK) {
-					try {
-						event.put("type", "keypress");
-						event.put("keyCode", "back");
-					} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				} else if (keyCode==KeyEvent.KEYCODE_DPAD_UP) {
-					try {
-						event.put("type", "keypress");
-						event.put("keyCode", "up");
-					} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				} else if (keyCode==KeyEvent.KEYCODE_DPAD_DOWN) {
-					try {
-						event.put("type", "keypress");
-						event.put("keyCode", "down");
-					} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				} else if (keyCode==KeyEvent.KEYCODE_DPAD_LEFT) {
-					try {
-						event.put("type", "keypress");
-						event.put("keyCode", "left");
-					} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				} else if (keyCode==KeyEvent.KEYCODE_DPAD_RIGHT) {
-					try {
-						event.put("type", "keypress");
-						event.put("keyCode", "right");
-					} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				} else {*/
 					try {
 						event.put("type", "key");
 						event.put("keyCode", keyCode);
@@ -400,7 +392,6 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				//}
 
 				PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event);
 				errorResult.setKeepCallback(true);
@@ -509,6 +500,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		dialog = null;
 		player = null;
 		videoView = null;
+		detector = null;
 		callbackContext = null;
 
 		return false;
@@ -565,6 +557,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		dialog = null;
 		player = null;
 		videoView = null;
+		detector = null;
 		callbackContext = null;
 	}
 
@@ -637,6 +630,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 
 			prepared = false;
 			videoView = null;
+			detector = null;
 			callbackContext = null;
 
 			return true;
