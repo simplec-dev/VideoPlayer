@@ -292,6 +292,8 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			} catch (Exception e) {
 				callbackContext.error(e.getLocalizedMessage());
 				Log.v(LOG_TAG, "error3: " + e.getLocalizedMessage());
+				stop();
+				return;
 			}
 		} else {
 			try {
@@ -300,6 +302,8 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			} catch (Exception e) {
 				callbackContext.error(e.getLocalizedMessage());
 				Log.v(LOG_TAG, "error4: " + e.getLocalizedMessage());
+				stop();
+				return;
 			}
 		}
 
