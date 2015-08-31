@@ -2,7 +2,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.simplec.plugins.videoplayer"
-    version="1.0.63">
+    version="1.0.64">
 
     <engines>
         <engine name="cordova" version=">=3.2.0" />
@@ -30,6 +30,7 @@
         </config-file>
         
 	    <source-file src="src/android/com/simplec/phonegap/plugins/videoplayer/VideoPlayer.java" target-dir="src/com/simplec/phonegap/plugins/videoplayer"/>
+	    <source-file src="src/android/com/simplec/phonegap/plugins/videoplayer/PlayerGestureDetection.java" target-dir="src/com/simplec/phonegap/plugins/videoplayer"/>
 	</platform>
     
 </plugin>
