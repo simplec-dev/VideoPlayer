@@ -420,7 +420,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 
 	@Override
 	public boolean onError(MediaPlayer mp, int what, int extra) {
-		Log.e(LOG_TAG, "AudioPlayer.onError(" + what + ", " + extra + ")");
+		Log.e(LOG_TAG, "VideoPlayer.onError(" + what + ", " + extra + ")");
 
 		JSONObject event = new JSONObject();
 		try {
