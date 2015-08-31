@@ -461,6 +461,9 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			e.printStackTrace();
 		}
 		
+		Log.v(LOG_TAG, "starting video");
+		mp.start();
+		
 		PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event);
 		errorResult.setKeepCallback(true);
 		callbackContext.sendPluginResult(errorResult);
@@ -472,8 +475,6 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		mc.setVisibility(View.VISIBLE);
 		//((ViewGroup)videoView.getParent()).addView(mc);*/
 
-		Log.v(LOG_TAG, "starting video");
-		mp.start();
 	}
 
 	@Override
