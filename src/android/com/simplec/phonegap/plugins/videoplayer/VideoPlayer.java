@@ -351,20 +351,62 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 				Log.v(LOG_TAG, "onKey keyCode="+keyCode+"  evt.keycode"+keyEvent.getKeyCode()+"  evt.flags"+keyEvent.getFlags());
 
 				JSONObject event = new JSONObject();
-				try {
-					event.put("type", "key");
-					event.put("keyCode", keyCode);
-					event.put("flags", keyEvent.getFlags());
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if (keyCode==KeyEvent.KEYCODE_BACK) {
+					try {
+						event.put("type", "keypress");
+						event.put("keyCode", "back");
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} else if (keyCode==KeyEvent.KEYCODE_DPAD_UP) {
+					try {
+						event.put("type", "keypress");
+						event.put("keyCode", "up");
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} else if (keyCode==KeyEvent.KEYCODE_DPAD_DOWN) {
+					try {
+						event.put("type", "keypress");
+						event.put("keyCode", "down");
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} else if (keyCode==KeyEvent.KEYCODE_DPAD_LEFT) {
+					try {
+						event.put("type", "keypress");
+						event.put("keyCode", "left");
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} else if (keyCode==KeyEvent.KEYCODE_DPAD_RIGHT) {
+					try {
+						event.put("type", "keypress");
+						event.put("keyCode", "right");
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} else {
+					try {
+						event.put("type", "key");
+						event.put("keyCode", keyCode);
+						event.put("flags", keyEvent.getFlags());
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 
 				PluginResult errorResult = new PluginResult(PluginResult.Status.OK, event);
 				errorResult.setKeepCallback(true);
 				callbackContext.sendPluginResult(errorResult);
 				
-				return webView.onKeyDown(keyCode, keyEvent);
+				return cordova.getActivity().onKeyDown(keyCode, keyEvent);
 			}
 		});
 
