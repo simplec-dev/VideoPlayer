@@ -205,17 +205,11 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		this.callbackContext = callbackContext;
 
 		MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
-		player = new MediaPlayer();
-		player.setOnPreparedListener(this);
-		player.setOnCompletionListener(this);
-		player.setOnErrorListener(this);
-
 		if (path.startsWith(ASSETS)) {
 			String f = path.substring(ASSETS.length());
 			AssetFileDescriptor fd = null;
 			try {
 				fd = cordova.getActivity().getAssets().openFd(f);
-				player.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
 				metaRetriever.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
 			} catch (Exception e) {
 				callbackContext.error(e.getLocalizedMessage());
@@ -224,7 +218,6 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		} else {
 			try {
 				Log.v(LOG_TAG, "setDataSource file");
-				player.setDataSource(path);
 				metaRetriever.setDataSource(path);
 			} catch (Exception e) {
 				callbackContext.error(e.getLocalizedMessage());
@@ -287,6 +280,31 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		// videoView.setVideoURI(uri);
 		// videoView.setVideoPath(path);
 		main.addView(videoView);
+
+		player = new MediaPlayer();
+		player.setOnPreparedListener(this);
+		player.setOnCompletionListener(this);
+		player.setOnErrorListener(this);
+
+		if (path.startsWith(ASSETS)) {
+			String f = path.substring(ASSETS.length());
+			AssetFileDescriptor fd = null;
+			try {
+				fd = cordova.getActivity().getAssets().openFd(f);
+				player.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
+			} catch (Exception e) {
+				callbackContext.error(e.getLocalizedMessage());
+				Log.v(LOG_TAG, "error: " + e.getLocalizedMessage());
+			}
+		} else {
+			try {
+				Log.v(LOG_TAG, "setDataSource file");
+				player.setDataSource(path);
+			} catch (Exception e) {
+				callbackContext.error(e.getLocalizedMessage());
+				Log.v(LOG_TAG, "error: " + e.getLocalizedMessage());
+			}
+		}
 
 		videoView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
 			
