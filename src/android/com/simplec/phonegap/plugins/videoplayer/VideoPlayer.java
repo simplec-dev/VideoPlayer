@@ -368,7 +368,9 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				Log.v(LOG_TAG, "onTouch ");
-				detector.onTouchEvent(event);
+				if (detector!=null) {
+					detector.onTouchEvent(event);
+				}
 				return true;
 			}
 		});
