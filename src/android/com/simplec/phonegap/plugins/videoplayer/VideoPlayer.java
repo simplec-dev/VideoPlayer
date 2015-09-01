@@ -196,6 +196,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		} catch (JSONException je) {
 			Log.v(LOG_TAG, "error2: " + je.getMessage());
 			callbackContext.error(je.getMessage());
+			je.printStackTrace();
 			return false;
 		}
 	}
