@@ -174,23 +174,40 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 
 			Log.v(LOG_TAG, "playing file: " + fileUriStr);
 
-			final String path = stripFileProtocol(fileUriStr);
+			if (fileUriStr.startsWith("file:")) {
+				final String path = stripFileProtocol(fileUriStr);
+	
+				File f = new File(path);
+				if (!f.exists()) {
+					Log.v(LOG_TAG, "does not exist: " + fileUriStr);
+					callbackContext.error("video does not exist");
+					return true;
+				}
 
-			File f = new File(path);
-			if (!f.exists()) {
-				Log.v(LOG_TAG, "does not exist: " + fileUriStr);
-				callbackContext.error("video does not exist");
-				return true;
+				Log.v(LOG_TAG, "playing path: " + path);
+				// Create dialog in new thread
+				cordova.getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						Log.v(LOG_TAG, "openVideoDialog");
+						openVideoDialog(path, options, callbackContext);
+					}
+				});
+			} else if (fileUriStr.startsWith("http:") || fileUriStr.startsWith("https:")) {
+				final String path = fileUriStr;
+
+				Log.v(LOG_TAG, "playing URL: " + path);
+				// Create dialog in new thread
+				cordova.getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						Log.v(LOG_TAG, "openVideoDialog");
+						openVideoDialog(path, options, callbackContext);
+					}
+				});
+			} else {
+				Log.v(LOG_TAG, "unknown protocol: " + fileUriStr);
+				callbackContext.error("video unknown protocol");
 			}
 
-			Log.v(LOG_TAG, "playing path: " + path);
-			// Create dialog in new thread
-			cordova.getActivity().runOnUiThread(new Runnable() {
-				public void run() {
-					Log.v(LOG_TAG, "openVideoDialog");
-					openVideoDialog(path, options, callbackContext);
-				}
-			});
 
 			return true;
 		} catch (JSONException je) {
