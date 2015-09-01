@@ -232,6 +232,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			} catch (Exception e) {
 				callbackContext.error(e.getLocalizedMessage());
 				Log.v(LOG_TAG, "error: " + e.getLocalizedMessage());
+				e.printStackTrace();
 			}
 		} else {
 			try {
@@ -240,6 +241,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			} catch (Exception e) {
 				callbackContext.error(e.getLocalizedMessage());
 				Log.v(LOG_TAG, "error: " + e.getLocalizedMessage());
+				e.printStackTrace();
 			}
 		}
 
@@ -359,6 +361,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			} catch (Exception e) {
 				callbackContext.error(e.getLocalizedMessage());
 				Log.v(LOG_TAG, "error3: " + e.getLocalizedMessage());
+				e.printStackTrace();
 				stop();
 				return;
 			}
@@ -369,6 +372,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 			} catch (Exception e) {
 				callbackContext.error(e.getLocalizedMessage());
 				Log.v(LOG_TAG, "error4: " + e.getLocalizedMessage());
+				e.printStackTrace();
 				stop();
 				return;
 			}
