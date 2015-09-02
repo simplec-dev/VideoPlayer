@@ -297,7 +297,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		videoView = new VideoView(cordova.getActivity());
 		videoView.setBackgroundColor(color.black);
 		videoView.setLayoutParams(new LinearLayout.LayoutParams(w, h));
-		videoView.setZOrderOnTop(true);
+		//videoView.setZOrderOnTop(true);
 		// videoView.setVideoURI(uri);
 		// videoView.setVideoPath(path);
 		main.addView(videoView);
