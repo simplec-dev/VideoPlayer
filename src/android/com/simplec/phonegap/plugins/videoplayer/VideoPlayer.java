@@ -293,6 +293,7 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 		// main.setOrientation(LinearLayout.VERTICAL);
 		main.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
 		main.setVerticalGravity(Gravity.CENTER_VERTICAL);
+		main.setLayerType(View.LAYER_TYPE_NONE, null);
 
 		videoView = new VideoView(cordova.getActivity());
 		videoView.setBackgroundColor(color.black);
