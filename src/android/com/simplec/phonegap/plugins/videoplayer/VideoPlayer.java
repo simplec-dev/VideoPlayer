@@ -313,10 +313,10 @@ public class VideoPlayer extends CordovaPlugin implements OnCompletionListener, 
 				try {
 					event.put("type", "swipe");
 					if (direction==PlayerGestureDetection.SWIPE_LEFT) {
-						event.put("direction", "left");
+						event.put("direction", "right");
 					}
 					if (direction==PlayerGestureDetection.SWIPE_RIGHT) {
-						event.put("direction", "right");
+						event.put("direction", "left");
 					}
 					if (direction==PlayerGestureDetection.SWIPE_UP) {
 						event.put("direction", "up");
